@@ -10275,3 +10275,7 @@ form .row:first-child .floating-label-form-group {
   box-shadow: 0 0 0 0.2rem rgba(26, 188, 156, 0.5);
 }
 
+.item-title {
+    font-size: 1rem;
+    font-weight: bolder;
+  }
