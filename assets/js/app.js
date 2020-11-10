@@ -11,7 +11,11 @@ $(document).ready(function () {
     // Function to display search results when button is clicked
     function displayWorkouts() {
         var searchTerm = $(this).attr("data-name");
-        var queryURL = "https://www.googleapis.com/youtube/v3/search?key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE&part=snippet&maxResults=3&q=" + searchTerm;
+        var queryURL = "https://www.googleapis.com/youtube/v3/search?key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE" 
+            + "&part=snippet"
+            + "&maxResults=3"
+            + "&type=video"
+            + "&q=" + searchTerm;
 
         // Creating an AJAX call for the specific search
         $.ajax({
@@ -22,7 +26,11 @@ $(document).ready(function () {
             $("#workout-view").empty();
 
             // Call function to fetch workouts
-            for (i = 0; i < 10; i++) {
+            for (i = 0; i < 1; i++) {
+                var tagURL = "https://www.googleapis.com/youtube/v3/videos?key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE" 
+                + "&part=snippet"
+                + "&id=" + response.items[i].id.videoId;
+                console.log(tagURL)
                 var workoutDiv = $('<div class="col-md-6 col-lg-4 mb-5">');
                 var title = $('<div class="item-title">').text(response.items[i].snippet.title + " ");
                 var channel = $('<p class="small">').text("by " + response.items[i].snippet.channelTitle);
@@ -103,7 +111,7 @@ $(document).ready(function () {
 
 
     // Click event listener to all elements with a class of "gif-btn"
-    $(document).on("click", ".filter-btn", displayWorkouts);
+    // $(document).on("click", ".filter-btn", displayWorkouts);
 
     // Click event listener to all elements with a class of "gif"
     $(document).on("click", ".gif", clickGifs);
