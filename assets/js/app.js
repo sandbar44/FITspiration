@@ -3,54 +3,139 @@ $(document).ready(function () {
 
     // GLOBAL VARIABLES
     // ==================================================
-    var searchTerms = ['core finisher', 'metcon', 'barre', 'yoga'];
+    var searchTerms = ['core', 'metcon', 'barre', 'yoga'];
+    var approvedChannels = [
+        // HIIT / CORE
+        'UCqjwF8rxRsotnojGl4gM0Zw' // THENX
+        , 'UCaBqRxHEMomgFU-AkSfodCw' // Chris Heria
+        , 'UCERm5yFZ1SptUEU4wZ2vJvw' // Jeremy Ethier
+        , 'UCe0TLA0EsQbE-MjuHXevj2A' // ATHLEAN-X
+        // METCON
+        , 'UCzG8mjsSZCl2v5dUFy-kGsg' // Jump Rope Fit
+        , 'UCEtMRF1ywKMc4sf3EXYyDzw' // ScottHermanFitness
+        , 'UCrzICdOsXhtn4zMlk4bnTIg' // Funk Roberts
+        // BARRE
+        , 'UCBINFWq52ShSgUFEoynfSwg' // POPSUGAR Fitness
+        , 'UCpy8VXKDK6Kfp9evUI' // Coach Kel
+        , 'UCIiI9tAbgvSPPL_50gefFtw' // nourishmovelove
+        // YOGA
+        , 'UCFKE7WVJfvaHW5q283SxchA' // Yoga With Adriene 
+    ]
+
+    var quote = '';
+    var author = '';
+    var query = [];
 
     // EXECUTE
     // ==================================================
 
+    // Random Quote Generator
+    fetch('https://api.quotable.io/random?tags=inspirational')
+        .then(response => response.json())
+        .then(data => {
+            quote = data.content;
+            author = data.author;
+            $('#quote').text(quote);
+            $('#author').text(author);
+        });
+
+    // Create filters
+    function createFilter() {
+        // Get data-state of clicked button
+        var state = $(this).attr("data-state");
+        // If the clicked button data-state is inactive, set data-state to active
+        // Update button styling to active
+        // Then add to query array
+        if (state === "inactive") {
+            $(this).attr("data-state", "active");
+            $(this).addClass("active");
+            var searchTerm = $(this).attr('data-name');
+            query.push(searchTerm);
+            // Else set data-state to inactive
+            // Remove active button styling
+            // Then remove from query array, if it exists
+        } else {
+            $(this).attr("data-state", "inactive");
+            $(this).removeClass("active");
+            var searchTerm = $(this).attr('data-name');
+            var removeTerm = query.findIndex(term => term === searchTerm);
+            if (removeTerm > -1) {
+                query.splice(removeTerm, 1)
+            }
+        };
+        console.log(query);
+    };
+
     // Function to display search results when button is clicked
     function displayWorkouts() {
-        var searchTerm = $(this).attr("data-name");
-        var queryURL = "https://www.googleapis.com/youtube/v3/search?key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE" 
-            + "&part=snippet"
-            + "&maxResults=3"
-            + "&type=video"
-            + "&q=" + searchTerm;
+        console.log(query)
+        var queryURL = 'https://www.googleapis.com/youtube/v3/search?'
+            + 'key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE'
+            + '&part=snippet'
+            + '&maxResults=9'
+            + '&type=video'
+            + '&channelId=' + approvedChannels
+            + '&q=' + query;
+        console.log(queryURL);
 
         // Creating an AJAX call for the specific search
         $.ajax({
             url: queryURL,
-            method: "GET"
-        }).then(function (response) {
+            method: 'GET'
+        }).done(function (response) {
             // Empty the contents of search results
-            $("#workout-view").empty();
+            $('#workout-view').empty();
+            console.log(response);
 
-            // Call function to fetch workouts
-            for (i = 0; i < 1; i++) {
-                var tagURL = "https://www.googleapis.com/youtube/v3/videos?key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE" 
-                + "&part=snippet"
-                + "&id=" + response.items[i].id.videoId;
-                console.log(tagURL)
-                var workoutDiv = $('<div class="col-md-6 col-lg-4 mb-5">');
-                var title = $('<div class="item-title">').text(response.items[i].snippet.title + " ");
-                var channel = $('<p class="small">').text("by " + response.items[i].snippet.channelTitle);
-                var thumbnail = response.items[i].snippet.thumbnails.medium.url;
-                var workoutItem = $("<img>").attr({
-                    "src": thumbnail,
-                });
-                
-                // Append the new search results
-                var workoutLink = $("<a>").attr({
-                    "href" : "https://www.youtube.com/watch?v=" + response.items[i].id.videoId,
-                    "target" : "_blank"
-                });
-                workoutLink.append(workoutItem, title, channel);
-                workoutDiv.append(workoutLink);
-                $("#workout-view").append(workoutDiv);
-
+            if (response.pageInfo.totalResults === 0) {
+                $('#workout-view').html('<center>Sorry, no results!</center>');
             }
-        })
+            else {
+                // Create search results header
+                $('#workout-header').html('<h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">SELECT YOUR WORKOUT!</h2>');
 
+                // Call function to fetch workouts
+                for (i = 0; i < 9; i++) {
+                    // var tagURL = 'https://www.googleapis.com/youtube/v3/videos?'
+                    // + 'key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE'
+                    // + '&part=snippet'
+                    // + '&id=' + response.items[i].id.videoId;
+                    // console.log(tagURL)
+
+                    // Only show workouts from approved channels
+                    var approvedChannel = approvedChannels.findIndex(approve => approve === response.items[i].snippet.channelId)
+                    if (approvedChannel > -1) {
+
+                        // Create workout div
+                        var workoutDiv = $('<div class="col-md-6 col-lg-4 mb-5">');
+                        var title = $('<div class="item-title">').text(response.items[i].snippet.title + ' ');
+                        var channel = $('<p class="small">').text('by ' + response.items[i].snippet.channelTitle);
+                        var thumbnail = response.items[i].snippet.thumbnails.medium.url;
+                        var workoutItem = $('<img>').attr({
+                            'src': thumbnail,
+                        });
+
+                        // Append the new search results
+                        var workoutLink = $('<a>').attr({
+                            'href': 'https://www.youtube.com/watch?v=' + response.items[i].id.videoId,
+                            'target': '_blank'
+                        });
+                        workoutLink.append(workoutItem, title, channel);
+                        workoutDiv.append(workoutLink);
+                        $('#workout-view').append(workoutDiv);
+
+                        console.log('GET succeeded!')
+                    }
+                }
+            }
+        }).fail(function (response) {
+            // Empty the contents of search results
+            $('#workout-view').empty();
+            console.log(response);
+            $('#workout-view').html('<div class="col-md-12 col-lg-12 mb-12 text-center">Error. Please try again later.</div>');
+
+            console.log('GET failed!')
+        })
     };
 
     // Function for displaying buttons
@@ -58,63 +143,29 @@ $(document).ready(function () {
 
         // Deleting the buttons prior to adding new buttons
         // (this is necessary to prevent repeat buttons)
-        $("#filter-btns").empty();
+        $('#filter-btns').empty();
 
         // Loop through the array of topics
         for (var i = 0; i < searchTerms.length; i++) {
 
             // Then dynamicaly generate buttons for each topic in the array
             var a = $('<button type="btn" class="btn btn-outline-filter filter-btn">');
-            // Providing the initial button text
+            // Provide the initial button text
             a.text(searchTerms[i]);
-            // Adding a data-attribute
-            a.attr("data-name", searchTerms[i]);
+            // Add data-attributes
+            a.attr('data-name', searchTerms[i]);
+            a.attr('data-state', 'inactive');
 
             // Adding the button to the buttons div
-            $("#filter-btns").append(a);
+            $('#filter-btns').append(a);
         }
     };
 
-    // Function for handling events where a gif is clicked
-    function clickGifs() {
-        // Get data-state of clicked gif
-        var state = $(this).attr("data-state");
-        // If the clicked image's state is still, update its src attribute to what its data-animate value is.
-        // Then, set the image's data-state to animate
-        // Else set src to the data-still value
-        if (state === "still") {
-            $(this).attr("src", $(this).attr("data-animate"));
-            $(this).attr("data-state", "animate");
-        } else {
-            $(this).attr("src", $(this).attr("data-still"));
-            $(this).attr("data-state", "still");
-        }
-    };
+    // Click event listener to all elements with a class of 'filter-btn'
+    $(document).on('click', '.filter-btn', createFilter);
 
-    // Function for adding a new Gif button
-    $("#add-gif").on("click", function (event) {
-        event.preventDefault();
-
-        // Grab  input from the textbox
-        var gif = $("#gif-input").val().trim();
-
-        // Adding movie from the textbox to our array
-        if (gif !== "") {
-            topics.push(gif);
-        }
-
-        // Calling renderButtons which handles the processing of our movie array
-        renderButtons();
-
-        $("#gif-form").trigger("reset");
-    });
-
-
-    // Click event listener to all elements with a class of "gif-btn"
-    // $(document).on("click", ".filter-btn", displayWorkouts);
-
-    // Click event listener to all elements with a class of "gif"
-    $(document).on("click", ".gif", clickGifs);
+    // Click event listener to all elements with a class of 'filter-btn'
+    $('#submit-btn').on('click', displayWorkouts);
 
     // Calling the renderButtons function to display the intial buttons
     renderButtons();

@@ -53,8 +53,8 @@
     <!-- Masthead-->
     <div class="masthead bg-primary text-white text-center">
         <div class="container d-flex align-items-center flex-column">
-            <!-- Masthead Subheading-->
-            <p class="masthead-subheading font-weight-light mb-0">[Inspirational Quote Placeholder]</p>
+            <div class="font-weight-light mb-0" id="quote"></div>
+            <div class="blockquote-footer text-white"><cite id="author"></cite></div>
         </div>
     </div>
     <!-- Filter Section-->
@@ -62,8 +62,9 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6 col-lg-4 mb-5">
-                    <div class="filter-header">Workout Type</div>
+                    <div class="filter-header">Select Workout Type</div>
                     <div class="btn-group" id="filter-btns"></div>
+                    <div class="form-group" style="margin-top:10px"><button class="btn btn-primary btn-sm" id="submit-btn" type="submit">Search</button></div>
                 </div>
             </div>
         </div>
@@ -72,90 +73,13 @@
     <section class="page-section portfolio" id="portfolio">
         <div class="container">
             <!-- Icon Divider-->
-            <div class="divider-custom">
-                <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">RECOMMENDED WORKOUTS
-                </h2>
-            </div>
-            <!-- Portfolio Grid Items-->
-            <div class="row" id="workout-view">
-            </div>
-            <!-- Portfolio Item 1-->
-            <!-- <div class="col-md-6 col-lg-4 mb-5">
-                    <div class="portfolio-item mx-auto">
-                        <img class="img-fluid" src="assets/img/portfolio/cabin.png" alt="" />
-                    </div>
-                </div> -->
+            <div class="divider-custom" id="workout-header"></div>
+            <!-- Workout Grid Items-->
+            <div class="row" id="workout-view"></div>
         </div>
         </div>
     </section>
-    <!-- Portfolio Section-->
-    <section class="page-section portfolio" id="portfolio">
-        <div class="container">
-            <!-- Portfolio Section Heading-->
-            <!-- Icon Divider-->
-            <div class="divider-custom">
-                <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">SEARCH RESULTS
-                </h2>
-            </div>
-            <!-- Portfolio Grid Items-->
-            <div class="row justify-content-center">
-                <!-- Portfolio Item 1-->
-                <div class="col-md-6 col-lg-4 mb-5">
-                    <div class="portfolio-item mx-auto">
-                        <img class="img-fluid" src="assets/img/portfolio/cabin.png" alt="" />
-                    </div>
-                </div>
-                <!-- Portfolio Item 2-->
-                <div class="col-md-6 col-lg-4 mb-5">
-                    <div class="portfolio-item mx-auto">
-                        <img class="img-fluid" src="assets/img/portfolio/cake.png" alt="" />
-                    </div>
-                </div>
-                <!-- Portfolio Item 3-->
-                <div class="col-md-6 col-lg-4 mb-5">
-                    <div class="portfolio-item mx-auto">
-                        <img class="img-fluid" src="assets/img/portfolio/circus.png" alt="" />
-                    </div>
-                </div>
-                <!-- Portfolio Item 1-->
-                <div class="col-md-6 col-lg-4 mb-5">
-                    <div class="portfolio-item mx-auto">
-                        <img class="img-fluid" src="assets/img/portfolio/cabin.png" alt="" />
-                    </div>
-                </div>
-                <!-- Portfolio Item 2-->
-                <div class="col-md-6 col-lg-4 mb-5">
-                    <div class="portfolio-item mx-auto">
-                        <img class="img-fluid" src="assets/img/portfolio/cake.png" alt="" />
-                    </div>
-                </div>
-                <!-- Portfolio Item 3-->
-                <div class="col-md-6 col-lg-4 mb-5">
-                    <div class="portfolio-item mx-auto">
-                        <img class="img-fluid" src="assets/img/portfolio/circus.png" alt="" />
-                    </div>
-                </div>
-                <!-- Portfolio Item 1-->
-                <div class="col-md-6 col-lg-4 mb-5">
-                    <div class="portfolio-item mx-auto">
-                        <img class="img-fluid" src="assets/img/portfolio/cabin.png" alt="" />
-                    </div>
-                </div>
-                <!-- Portfolio Item 2-->
-                <div class="col-md-6 col-lg-4 mb-5">
-                    <div class="portfolio-item mx-auto">
-                        <img class="img-fluid" src="assets/img/portfolio/cake.png" alt="" />
-                    </div>
-                </div>
-                <!-- Portfolio Item 3-->
-                <div class="col-md-6 col-lg-4 mb-5">
-                    <div class="portfolio-item mx-auto">
-                        <img class="img-fluid" src="assets/img/portfolio/circus.png" alt="" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+
     <!-- Bootstrap core JS-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
