@@ -1,3 +1,6 @@
+// OPEN BUGS
+// [] weird behavior when repeating search
+
 // READY DOCUMENT
 $(document).ready(function () {
 
@@ -20,24 +23,18 @@ $(document).ready(function () {
         , 'UCIiI9tAbgvSPPL_50gefFtw' // nourishmovelove
         // YOGA
         , 'UCFKE7WVJfvaHW5q283SxchA' // Yoga With Adriene 
-    ]
+    ];
+    var maxResults = 9;
 
     var quote = '';
     var author = '';
     var query = [];
+    var approvedIndices = [];
+    var otherIndices = [];
+    var workoutDiv = '';
 
-    // EXECUTE
+    // FUNCTIONS
     // ==================================================
-
-    // Random Quote Generator
-    fetch('https://api.quotable.io/random?tags=inspirational')
-        .then(response => response.json())
-        .then(data => {
-            quote = data.content;
-            author = data.author;
-            $('#quote').text(quote);
-            $('#author').text(author);
-        });
 
     // Create filters
     function createFilter() {
@@ -68,13 +65,22 @@ $(document).ready(function () {
 
     // Function to display search results when button is clicked
     function displayWorkouts() {
-        console.log(query)
+        // Reset search results
+        $('#workout-header-rec').empty();
+        $('#workout-header').empty();
+        $('#workout-view-rec').empty();
+        $('#workout-view').empty();
+        approvedIndices = [];
+        otherIndices = [];
+
+        console.log(query);
+
         var queryURL = 'https://www.googleapis.com/youtube/v3/search?'
             + 'key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE'
             + '&part=snippet'
-            + '&maxResults=9'
             + '&type=video'
-            + '&channelId=' + approvedChannels
+            + '&maxResults=50'
+            + '&topicId=/m/027x7n'
             + '&q=' + query;
         console.log(queryURL);
 
@@ -83,38 +89,47 @@ $(document).ready(function () {
             url: queryURL,
             method: 'GET'
         }).done(function (response) {
-            // Empty the contents of search results
-            $('#workout-view').empty();
+
             console.log(response);
 
+            // If no results, show message
             if (response.pageInfo.totalResults === 0) {
                 $('#workout-view').html('<center>Sorry, no results!</center>');
             }
+
+            // If results exist, populate search results
             else {
-                // Create search results header
-                $('#workout-header').html('<h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">SELECT YOUR WORKOUT!</h2>');
-
-                // Call function to fetch workouts
-                for (i = 0; i < 9; i++) {
-                    // var tagURL = 'https://www.googleapis.com/youtube/v3/videos?'
-                    // + 'key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE'
-                    // + '&part=snippet'
-                    // + '&id=' + response.items[i].id.videoId;
-                    // console.log(tagURL)
-
-                    // Only show workouts from approved channels
+                
+                // Fetch workout data for all results
+                for (i = 0; i < response.pageInfo.resultsPerPage; i++) {
+                    
+                    // Identify workouts from approved channels
                     var approvedChannel = approvedChannels.findIndex(approve => approve === response.items[i].snippet.channelId)
                     if (approvedChannel > -1) {
-
+                        approvedIndices.push(i);
+                        console.log('approved ' + approvedIndices.length);
+                    }
+                    else {
+                        otherIndices.push(i);
+                        console.log('other ' + otherIndices.length);
+                    };
+                };
+                
+                // Create workout div for approved channels
+                if (approvedIndices.length > 0) {
+                    // Create recommended header                
+                    $('#workout-header-rec').html('<h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">Recommended Workouts</h2>');
+                    for (j = 0; j < approvedIndices.length; j++) {
+                        var i = approvedIndices[j];
                         // Create workout div
-                        var workoutDiv = $('<div class="col-md-6 col-lg-4 mb-5">');
+                        workoutDiv = $('<div class="col-md-6 col-lg-4 mb-5">');
                         var title = $('<div class="item-title">').text(response.items[i].snippet.title + ' ');
                         var channel = $('<p class="small">').text('by ' + response.items[i].snippet.channelTitle);
                         var thumbnail = response.items[i].snippet.thumbnails.medium.url;
                         var workoutItem = $('<img>').attr({
                             'src': thumbnail,
                         });
-
+                        
                         // Append the new search results
                         var workoutLink = $('<a>').attr({
                             'href': 'https://www.youtube.com/watch?v=' + response.items[i].id.videoId,
@@ -122,20 +137,51 @@ $(document).ready(function () {
                         });
                         workoutLink.append(workoutItem, title, channel);
                         workoutDiv.append(workoutLink);
-                        $('#workout-view').append(workoutDiv);
-
-                        console.log('GET succeeded!')
+                        $('#workout-view-rec').append(workoutDiv);
                     }
-                }
-            }
+                };
+                
+                // Display max 9 other workouts
+                for (k = 0; k < maxResults; k++) {
+                    // Create search results header
+                    $('#workout-header').html('<h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">Search Results</h2>');
+                    var i = otherIndices[k];
+                    // Create workout div
+                    workoutDiv = $('<div class="col-md-6 col-lg-4 mb-5">');
+                    var title = $('<div class="item-title">').text(response.items[i].snippet.title + ' ');
+                    var channel = $('<p class="small">').text('by ' + response.items[i].snippet.channelTitle);
+                    var thumbnail = response.items[i].snippet.thumbnails.medium.url;
+                    var workoutItem = $('<img>').attr({
+                        'src': thumbnail,
+                    });
+
+                    // Append the new search results
+                    var workoutLink = $('<a>').attr({
+                        'href': 'https://www.youtube.com/watch?v=' + response.items[i].id.videoId,
+                        'target': '_blank'
+                    });
+                    workoutLink.append(workoutItem, title, channel);
+                    workoutDiv.append(workoutLink);
+                    $('#workout-view').append(workoutDiv);
+                };
+
+                // Advanced feature: filter by tags
+                // var tagURL = 'https://www.googleapis.com/youtube/v3/videos?'
+                // + 'key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE'
+                // + '&part=snippet'
+                // + '&id=' + response.items[i].id.videoId;
+                // console.log(tagURL)
+
+            };
+
         }).fail(function (response) {
             // Empty the contents of search results
             $('#workout-view').empty();
             console.log(response);
             $('#workout-view').html('<div class="col-md-12 col-lg-12 mb-12 text-center">Error. Please try again later.</div>');
 
-            console.log('GET failed!')
-        })
+            console.log('GET failed!');
+        });
     };
 
     // Function for displaying buttons
@@ -160,6 +206,19 @@ $(document).ready(function () {
             $('#filter-btns').append(a);
         }
     };
+
+    // EXECUTE
+    // ==================================================
+
+    // Random Quote Generator
+    fetch('https://api.quotable.io/random?tags=inspirational')
+        .then(response => response.json())
+        .then(data => {
+            quote = data.content;
+            author = data.author;
+            $('#quote').text(quote);
+            $('#author').text(author);
+        });
 
     // Click event listener to all elements with a class of 'filter-btn'
     $(document).on('click', '.filter-btn', createFilter);
