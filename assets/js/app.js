@@ -1,5 +1,9 @@
-// OPEN BUGS
-// [] fix youtube video responsive width
+// OPEN TO DO
+// [] Must have User Input Validation 
+// [] Utilize Firebase for Persistent Data Storage
+// [] Alternative CSS framework like Materialize
+// [] Refactor code
+// [] Update Readme
 
 // READY DOCUMENT
 $(document).ready(function () {
