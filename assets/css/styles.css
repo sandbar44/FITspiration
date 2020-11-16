@@ -70,6 +70,13 @@ body {
   color: #212529;
   text-align: left;
   background-color: #fff;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
 }
 
 [tabindex="-1"]:focus:not(:focus-visible) {
@@ -159,7 +166,7 @@ a, .portfolio-item {
   background-color: transparent;
 }
 
-a:hover, .portfolio-item:hover {
+a:hover, .portfolio-item:hover, .like-btn:hover {
   color: #117964;
   /* text-decoration: underline; */
 }
@@ -5357,7 +5364,7 @@ a.close.disabled {
   z-index: 1050;
   display: none;
   width: 100%;
-  height: 100%;
+  /* height: 100%; */
   overflow: hidden;
   outline: 0;
 }
@@ -9237,7 +9244,7 @@ a.text-dark:hover, a.text-dark:focus {
 
 @media (min-width: 992px) {
   .masthead {
-    padding-top: calc(1rem + 104px);
+    padding-top: calc(1rem + 74px);
     padding-bottom: 1rem;
   }
   .masthead .masthead-heading {
@@ -9437,4 +9444,25 @@ form .row:first-child .floating-label-form-group {
   display: -webkit-inline-flex;
   display: inline-flex;
   opacity: 0.8;
+}
+
+.like-btn {
+  cursor: pointer;
+}
+
+.disabled {
+  color: #ffb703;
+}
+
+.channel {
+  font-size: 0.8rem;
+  float: left;
+  width: 50%;
+}
+
+.like {
+  font-size: 0.8rem;
+  float: right;
+  width: 40%;
+  text-align: right;
 }

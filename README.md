@@ -9,6 +9,8 @@ Find all your fitness inspirations in one spot!
 FITspiration provides the latest home workouts across multiple platforms using
 optimized keywords! Apply filters to target your fitness needs: workout type, muscle groups, time limit, and more!
 
+https://sandbar44.github.io/FITspiration
+
 ## Technologies Used
 
 ### Styling
@@ -35,3 +37,4 @@ optimized keywords! Apply filters to target your fitness needs: workout type, mu
 - Additional filters: difficulty, workout type, time limit
 - Save your favorite workouts for next time
 - Add your own custom keywords
+- Include more platforms in search (i.e., Reddit)

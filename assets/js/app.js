@@ -1,12 +1,18 @@
 // OPEN TO DO
+// [] Glitchy filter behavior on mobile (does not untap)
 // [] Must have User Input Validation 
-// [] Utilize Firebase for Persistent Data Storage
 // [] Alternative CSS framework like Materialize
 // [] Refactor code
 // [] Update Readme
+// [] Check Reddit API
+// [] Add About page
+// [] Loading icon
 
 // READY DOCUMENT
 $(document).ready(function () {
+
+    $('.modal').modal();
+    $('#user-agreement').modal('open');
 
     // GLOBAL VARIABLES
     // ==================================================
@@ -32,7 +38,7 @@ $(document).ready(function () {
     var muscleGroups = [
         {
             term: 'core',
-            optTerm: 'core,abs'
+            optTerm: 'core,abs,6+pack'
         },
         {
             term: 'upper body',
@@ -74,6 +80,61 @@ $(document).ready(function () {
     var workoutDiv = '';
     var workoutDivIds = [];
 
+    // Initialize Firebase configuration
+    var firebaseConfig = {
+        apiKey: "AIzaSyCWk94a0_WAd_Cl4W7sveje-QAhV_q2ZVU",
+        authDomain: "fitspiration-a396c.firebaseapp.com",
+        databaseURL: "https://fitspiration-a396c.firebaseio.com",
+        projectId: "fitspiration-a396c",
+        storageBucket: "fitspiration-a396c.appspot.com",
+        messagingSenderId: "362967630013",
+        appId: "1:362967630013:web:292b5a043baf914b1237d4",
+        measurementId: "G-EHZ21B7JL1"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Create a variable to reference the database.
+    var database = firebase.database();
+
+    // Firebase Psuedo Code
+    // [X] Display current stats for each value in firebase
+    //      [X] Grab each video id
+    //      [X] Display like count
+    // [X] When a user likes a workout, store the workout ID and like count in firebase
+    //      [X] Store videoID
+    //      [X] Increase likeCount
+    //      [X] Store updated likeCount in firebase
+    // [X] Look for font awesome icon for "fist bump"
+    // [] Add like button + count to workoutDiv creation
+    // [] Display like count under video
+
+    var workoutId = '';
+    var likeCount = 0;
+
+    // When a user clicks the 'Like' Button on a video
+    $(document).on('click', '.like-btn', function () {
+        workoutId = $(this).attr('workout-id');
+        likeCount = $(`#${workoutId}-likes`).text()
+        likeCount++
+
+        console.log(workoutId);
+        console.log(likeCount);
+
+        database.ref('workouts/' + workoutId).update({
+            workoutId,
+            likeCount
+        })
+
+        // Update stats for workout
+        $(`#${workoutId}-likes`).text(likeCount)
+
+        // Disable like btn
+        $(`[workout-id='${workoutId}'`)
+            .removeClass("like-btn")
+            .addClass("disabled")
+    });
+
     // FUNCTIONS
     // ==================================================
 
@@ -114,11 +175,6 @@ $(document).ready(function () {
         approvedIndices = [];
         otherIndices = [];
 
-        // Display Random WOD Generator for metcon
-        if ($('#metcon').attr('data-state') === 'active') {
-            $('#workout-header-rec').html('<h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">Recommended Workouts</h2>');
-            $('#workout-view-rec').append($('#wod-item-template').html());
-        }
 
         // Prepare AJAX call
         var queryURL = 'https://www.googleapis.com/youtube/v3/search?'
@@ -159,118 +215,120 @@ $(document).ready(function () {
                     };
                 };
 
-                // Create workout div for approved channels
-                if (approvedIndices.length > 0) {
-                    // Create recommended header                
-                    $('#workout-header-rec').html('<h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">Recommended Workouts</h2>');
-                    for (j = 0; j < approvedIndices.length; j++) {
-                        var i = approvedIndices[j];
-                        // Create workout div
-                        workoutDiv = $('<div class="col-md-6 col-lg-4 mb-5">');
-                        var title = $('<div class="item-title">').text(response.items[i].snippet.title + ' ');
-                        var channel = $('<p class="small">').text('by ' + response.items[i].snippet.channelTitle);
-                        var thumbnail = response.items[i].snippet.thumbnails.medium.url;
-                        var thumbnailDiv = $('<div>').attr({
-                            'id': response.items[i].id.videoId
-                        });
-                        var workoutItem = $('<img>').attr({
-                            'src': thumbnail,
-                            'class': 'workout-item'
-                        });
-                        thumbnailDiv.append(workoutItem);
-
-                        // Append the new search results
-                        var workoutLink = $('<a>').attr({
-                            'href': 'https://www.youtube.com/watch?v=' + response.items[i].id.videoId,
-                            'target': '_blank'
-                        });
-                        workoutLink.append(thumbnailDiv, title, channel);
-                        workoutDiv.append(workoutLink);
-                        $('#workout-view-rec').append(workoutDiv);
-
-                        // Add channel ID to array
-                        workoutDivIds.push(response.items[i].id.videoId)
-                    }
-                };
-
-                // Display max 9 other workouts
-                for (k = 0; k < maxResults; k++) {
-                    // Create search results header
-                    $('#workout-header').html('<h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">Search Results</h2>');
-                    var i = otherIndices[k];
+                // Create function to create workout divs
+                var createWorkoutDiv = function (i, section) {
                     // Create workout div
                     workoutDiv = $('<div class="col-md-6 col-lg-4 mb-5">');
                     var title = $('<div class="item-title">').text(response.items[i].snippet.title + ' ');
-                    var channel = $('<p class="small">').text('by ' + response.items[i].snippet.channelTitle);
+                    var channel = $('<span class="channel">').text('by ' + response.items[i].snippet.channelTitle);
+                    workoutId = response.items[i].id.videoId;
+                    var like = $('<span class="like">').html(
+                        `<i class="like-btn far fa-thumbs-up" workout-id="${workoutId}"></i>
+                        <span id="${workoutId}-likes">0</span>`
+                    );
                     var thumbnail = response.items[i].snippet.thumbnails.medium.url;
                     var thumbnailDiv = $('<div>').attr({
                         'id': response.items[i].id.videoId
                     });
-                    var workoutItem = $('<img>').attr({
+                    var workoutImg = $('<img>').attr({
                         'src': thumbnail,
                         'class': 'workout-item'
                     });
-                    thumbnailDiv.append(workoutItem);
+                    thumbnailDiv.append(workoutImg);
 
                     // Append the new search results
                     var workoutLink = $('<a>').attr({
                         'href': 'https://www.youtube.com/watch?v=' + response.items[i].id.videoId,
                         'target': '_blank'
                     });
-                    workoutLink.append(thumbnailDiv, title, channel);
-                    workoutDiv.append(workoutLink);
-                    $('#workout-view').append(workoutDiv);
+                    workoutLink.append(thumbnailDiv, title);
+                    workoutDiv.append(workoutLink, channel, like);
+
+                    // Generate divs under desired section
+                    $(section).append(workoutDiv);
 
                     // Add channel ID to array
                     workoutDivIds.push(response.items[i].id.videoId)
+                }
+            };
 
+            // Create workout div for approved channels
+            if (approvedIndices.length > 0) {
+                // Create recommended header                
+                $('#workout-header-rec').html('<h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">Recommended Workouts</h2>');
+
+                // Call function to create workout div with relevant Indices and into desired section
+                for (j = 0; j < approvedIndices.length; j++) {
+                    createWorkoutDiv(approvedIndices[j], '#workout-view-rec');
+                }
+            };
+
+            // Display max 9 other workouts
+            // Create search results header
+            $('#workout-header').html('<h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">Search Results</h2>');
+
+            for (k = 0; k < maxResults; k++) {
+                createWorkoutDiv(otherIndices[k], '#workout-view');
+            };
+
+            // Fetch workout video stats
+            var queryURLvideo = 'https://www.googleapis.com/youtube/v3/videos?'
+                + 'key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE'
+                + '&id=' + workoutDivIds
+                + '&part=snippet,contentDetails';
+
+            console.log(queryURLvideo);
+
+            $.ajax({
+                url: queryURLvideo,
+                method: 'GET'
+            }).done(function (response) {
+                console.log(response);
+
+                // Fetch data for each workout video
+                for (i = 0; i < response.items.length; i++) {
+                    var videoId = response.items[i].id;
+                    var ytDuration = response.items[i].contentDetails.duration;
+                    var duration = moment
+                        .duration(ytDuration)
+                        .format('h:mm:ss')
+                        .padStart(4, '0:0');
+
+                    // Add duration to each thumbnail
+                    var durationDiv = $('<div class="ytd-thumbnail-overlay-time-status-renderer">');
+                    durationDiv.text(duration);
+                    $(`#${videoId}`).append(durationDiv);
                 };
 
-                console.log('approved: ' + approvedIndices.length)
-                console.log('other: ' + otherIndices.length)
+                // Advanced feature: filter by tags
+                // var tagURL = 'https://www.googleapis.com/youtube/v3/videos?'
+                // + 'key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE'
+                // + '&part=snippet'
+                // + '&id=' + response.items[i].id.videoId;
+                // console.log(tagURL)
 
-                // Fetch workout video stats
-                var queryURLvideo = 'https://www.googleapis.com/youtube/v3/videos?'
-                    + 'key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE'
-                    + '&id=' + workoutDivIds
-                    + '&part=snippet,contentDetails'
-
-                console.log(queryURLvideo)
-
-                $.ajax({
-                    url: queryURLvideo,
-                    method: 'GET'
-                }).done(function (response) {
-                    console.log(response)
-
-                    // Fetch data for each workout video
-                    for (i = 0; i < response.items.length; i++) {
-                        var videoId = response.items[i].id;
-                        var ytDuration = response.items[i].contentDetails.duration;
-                        var duration = moment
-                            .duration(ytDuration)
-                            .format('h:mm:ss')
-                            .padStart(4, '0:0');
-                        console.log(ytDuration);
-                        console.log(duration);
-
-                        // Add duration to each thumbnail
-                        var durationDiv = $('<div class="ytd-thumbnail-overlay-time-status-renderer">');
-                        durationDiv.text(duration);
-                        $(`#${videoId}`).append(durationDiv);
-                    }
+            });
 
 
+            database.ref('/workouts').on('child_added', function (snapshot) {
+                // Get snapshot data
+                console.log(snapshot.val());
+                workoutId = snapshot.val().workoutId;
+                likeCount = snapshot.val().likeCount;
 
-                    // Advanced feature: filter by tags
-                    // var tagURL = 'https://www.googleapis.com/youtube/v3/videos?'
-                    // + 'key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE'
-                    // + '&part=snippet'
-                    // + '&id=' + response.items[i].id.videoId;
-                    // console.log(tagURL)
+                // Display stats for each workout
+                $(`#${workoutId}-likes`).text(likeCount);
 
-                });
-            };
+            }, function (errorObject) {
+                console.log("The read failed: " + errorObject.code);
+            });
+
+            // Display Random WOD Generator for metcon
+            if ($('#metcon').attr('data-state') === 'active') {
+                $('#workout-header-rec').html('<h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">Recommended Workouts</h2>');
+                $('#workout-view-rec').prepend($('#wod-item-template').html());
+            }
+
 
         }).fail(function (response) {
             // Empty the contents of search results
