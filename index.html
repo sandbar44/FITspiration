@@ -68,18 +68,25 @@
                     <div class="col-md-18 col-lg-12 mb-15 card bg-light">
                         <div class="row">
                             <div class="col-md-6 col-lg-4 mb-5">
-                                <div class="filter-header">Select Workout Type</div>
-                                <div class="btn-group" id="workout-type"></div>
+                                <div class="filter-header"><i class="fas fa-filter"></i> Select Workout Type</div>
+                                <div class="btn-group" id="workout-type-btns"></div>
                             </div>
+                            <div class="col-md-6 col-lg-4 mb-5">
+                                <div class="filter-header"><i class="fas fa-filter"></i> Select Muscle Group</div>
+                                <div class="btn-group" id="muscle-group-btns"></div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-12 col-lg-8 mb-10">
-                                <div class="filter-header">Select Muscle Group</div>
-                                <div class="btn-group" id="muscle-group"></div>
+                                <div class="filter-header"><i class="fas fa-sort"></i> Sort By</div>
+                                <div class="btn-group" id="sort-by-btns"></div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-18 col-lg-12 mb-15">
                                 <div class="form-group" style="margin-top:10px">
-                                    <button class="btn btn-primary btn-sm" id="submit-btn" type="submit">Search</button>
+                                    <button class="btn btn-secondary btn-sm" id="submit-btn"
+                                        type="submit">Search</button>
                                     <button class="btn btn-light btn-sm" id="reset-btn" type="reset">Reset</button>
                                 </div>
                             </div>
@@ -119,11 +126,13 @@
                     </div>
                     <div class="item-title">Crossfit WOD Generator </div>
                 </div>
-                <span class="channel">by Deniz Gurkaynak</span>
-                <span class="like">
-                    <i class="like-btn far fa-thumbs-up" workout-id="randomWod"></i>
-                    <span id="randomWod-likes">0</span>
-                </span>
+                <div class="workout-item mx-auto">
+                    <span class="channel">by Deniz Gurkaynak</span>
+                    <span class="like">
+                        <i class="like-btn far fa-thumbs-up" workout-id="randomWod"></i>
+                        <span id="randomWod-likes">0</span>
+                    </span>
+                </div>
             </div>
         </div>
 

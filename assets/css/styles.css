@@ -9380,14 +9380,13 @@ form .row:first-child .floating-label-form-group {
 }
 
 .btn-outline-filter:hover {
-  color: #fff;
-  background-color: red;
-  border-color: #023047;
+  opacity: 0.8;
+  border: solid 1px #023047;
 }
 
 .active {
-  color: #fff;
-  background-color: #023047;
+  color: #023047;
+  background-color: #ffb703;
   border-color: #023047;
 }
 
@@ -9410,6 +9409,13 @@ form .row:first-child .floating-label-form-group {
 }
 
 .workout-item {
+  position: relative;
+  display: block;
+  max-width: 25rem;
+  overflow: hidden;
+}
+
+.workout-img {
   border-radius: 5px;
 }
 
@@ -9421,7 +9427,7 @@ form .row:first-child .floating-label-form-group {
   display: inline-block;
   position: absolute;
   top: 0;
-  left: 1.5rem;
+  left: 0;
   margin: 4px;
   color: #000000;
   background-color: #ffb703;

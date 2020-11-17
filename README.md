@@ -18,6 +18,8 @@ https://sandbar44.github.io/FITspiration
 - Start Bootstrap Theme (https://startbootstrap.com/theme/freelancer)
 - Mobile Responsive
 - Modals
+- Font Awesome Icons (https://fontawesome.com)
+
 
 ### Javascript
 - jQuery
@@ -34,7 +36,7 @@ https://sandbar44.github.io/FITspiration
 - Firebase
 
 ## Future Development Features
-- Additional filters: difficulty, workout type, time limit
+- Additional filters: difficulty, time limit
 - Save your favorite workouts for next time
 - Add your own custom keywords
 - Include more platforms in search (i.e., Reddit)
