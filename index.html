@@ -78,8 +78,10 @@
                         </div>
                         <div class="row">
                             <div class="col-md-18 col-lg-12 mb-15">
-                                <div class="form-group" style="margin-top:10px"><button class="btn btn-primary btn-sm"
-                                        id="submit-btn" type="submit">Search</button></div>
+                                <div class="form-group" style="margin-top:10px">
+                                    <button class="btn btn-primary btn-sm" id="submit-btn" type="submit">Search</button>
+                                    <button class="btn btn-light btn-sm" id="reset-btn" type="reset">Reset</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -126,7 +128,7 @@
         </div>
 
         <!-- Portfolio Modal 1-->
-        <div class="portfolio-modal modal fade" id="portfolioModal1" tabindex="-1" role="dialog"
+        <div class="portfolio-modal modal-wod fade" id="portfolioModal1" tabindex="-1" role="dialog"
             aria-labelledby="portfolioModal1Label" aria-hidden="true">
             <div class="modal-dialog modal-xl" role="document">
                 <div class="modal-content">
@@ -168,17 +170,30 @@
             <div class="modal-content">
                 <h1>YouTube API Disclosure</h1>
                 <p>FITspiration uses YouTube application programming interface (API) services (YouTube API
-                    Services)
-                    to retrieve and share video content with users. This website does not collect or store any
-                    user
-                    information with external parties. By using this application, you agree to <a
-                        href="https://www.youtube.com/t/terms" target="_blank">YouTube's Terms of Service</a>.
+                    Services) to retrieve and share video content with users. This website does not collect or store any
+                    user information with external parties. By using this application, you agree to
+                    <a href="https://www.youtube.com/t/terms" target="_blank">YouTube's Terms of Service</a>.
                 </p>
                 <p>For more information, please review the <a href="http://www.google.com/policies/privacy"
                         target="_blank">Google Privacy Policy</a>.</p>
-                <span class="float-right">
-                    <button href="#!" class="modal-close btn btn-primary btn-md float-right">Agree</button>
-                </span>
+                <div class="align-middle float-right">
+                    <form action="#" class="needs-validation" novalidate>
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="invalidCheck" required>
+                                <label class="form-check-label" for="invalidCheck">
+                                    I agree
+                                </label>
+                                <div class="invalid-feedback">
+                                    You must agree before submitting.
+                                </div>
+                            </div>
+                        </div>
+
+                        <button href="#!" type="submit"
+                            class="modal-close btn btn-primary btn-md float-right">Continue</button>
+                    </form>
+                </div>
             </div>
         </div>
 
@@ -189,7 +204,8 @@
     <footer class="page-footer bg-white">
         <div class="footer-copyright">
             <div class="container text-center">
-                <a class="waves-effect waves-light btn modal-trigger" href="#user-agreement">User Agreement Disclosure</a>
+                <a class="waves-effect waves-light btn modal-trigger" href="#user-agreement">User Agreement
+                    Disclosure</a>
             </div>
         </div>
     </footer>

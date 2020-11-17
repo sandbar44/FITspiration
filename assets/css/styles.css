@@ -227,7 +227,7 @@ th {
 
 label {
   display: inline-block;
-  margin-bottom: 0.5rem;
+  /* margin-bottom: 0.5rem; */
 }
 
 button {
@@ -235,8 +235,8 @@ button {
 }
 
 button:focus {
-  outline: 1px dotted;
-  outline: 5px auto -webkit-focus-ring-color;
+  outline: 0px;
+  /* outline: 5px auto -webkit-focus-ring-color; */
 }
 
 input, button, select, optgroup, textarea {
@@ -2444,18 +2444,18 @@ a.btn.disabled, fieldset:disabled a.btn {
   border-color: #f8f9fa;
 }
 
-.btn-light:hover {
+/* .btn-light:hover {
   color: #212529;
   background-color: #e2e6ea;
   border-color: #dae0e5;
-}
+} 
 
 .btn-light:focus, .btn-light.focus {
   color: #212529;
   background-color: #e2e6ea;
   border-color: #dae0e5;
   box-shadow: 0 0 0 0.2rem rgba(216, 217, 219, 0.5);
-}
+} 
 
 .btn-light.disabled, .btn-light:disabled {
   color: #212529;
@@ -2471,7 +2471,7 @@ a.btn.disabled, fieldset:disabled a.btn {
 
 .btn-light:not(:disabled):not(.disabled):active:focus, .btn-light:not(:disabled):not(.disabled).active:focus, .show>.btn-light.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(216, 217, 219, 0.5);
-}
+} */
 
 .btn-dark {
   color: #fff;
@@ -5357,14 +5357,14 @@ a.close.disabled {
   overflow-y: auto;
 }
 
-.modal {
+.modal-wod {
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1050;
   display: none;
   width: 100%;
-  /* height: 100%; */
+  height: 100%;
   overflow: hidden;
   outline: 0;
 }
@@ -9244,7 +9244,7 @@ a.text-dark:hover, a.text-dark:focus {
 
 @media (min-width: 992px) {
   .masthead {
-    padding-top: calc(1rem + 74px);
+    padding-top: calc(1rem + 104px);
     padding-bottom: 1rem;
   }
   .masthead .masthead-heading {
@@ -9381,7 +9381,7 @@ form .row:first-child .floating-label-form-group {
 
 .btn-outline-filter:hover {
   color: #fff;
-  background-color: #023047;
+  background-color: red;
   border-color: #023047;
 }
 

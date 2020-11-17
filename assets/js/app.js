@@ -1,18 +1,12 @@
 // OPEN TO DO
 // [] Glitchy filter behavior on mobile (does not untap)
-// [] Must have User Input Validation 
-// [] Alternative CSS framework like Materialize
 // [] Refactor code
 // [] Update Readme
 // [] Check Reddit API
-// [] Add About page
 // [] Loading icon
 
 // READY DOCUMENT
 $(document).ready(function () {
-
-    $('.modal').modal();
-    $('#user-agreement').modal('open');
 
     // GLOBAL VARIABLES
     // ==================================================
@@ -162,6 +156,15 @@ $(document).ready(function () {
                 query.splice(removeTerm, 1)
             }
         };
+        console.log(query);
+    };
+
+    // Reset filters
+    function resetFilters() {
+        $('.filter-btn')
+            .attr('data-state', 'inactive')
+            .removeClass('active')
+        query = [];
         console.log(query);
     };
 
@@ -389,6 +392,33 @@ $(document).ready(function () {
         }
     };
 
+    // Disable form submissions if there are invalid fields
+    var validateForm = function () {
+        'use strict';
+        window.addEventListener('load', function () {
+            // Fetch all forms
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false) {
+                        // event.preventDefault();
+                        // event.stopPropagation();
+                        $('#user-agreement').modal('open');
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    };
+
+    // Initialize Modals
+    $('.modal').modal();
+    $('#user-agreement').modal('open', {
+        dismissible: false,
+        onCloseStart: validateForm()
+    });
+
     // EXECUTE
     // ==================================================
 
@@ -407,6 +437,9 @@ $(document).ready(function () {
 
     // Click event listener to execute search
     $('#submit-btn').on('click', displayWorkouts);
+
+    // Click event listener to reset filters
+    $('#reset-btn').on('click', resetFilters);
 
     // Click event listener to regenerate WOD
     $('#generate-wod').on('click', generateWod);
