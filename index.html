@@ -78,19 +78,33 @@
                         </div>
                         <div class="row">
                             <div class="col-md-12 col-lg-8 mb-10">
-                                <div class="filter-header"><i class="fas fa-sort"></i> Sort By</div>
+                                <div class="filter-header"><i class="fas fa-sort"></i> Prioritize By</div>
                                 <div class="btn-group" id="sort-by-btns"></div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-18 col-lg-12 mb-15">
                                 <div class="form-group" style="margin-top:10px">
-                                    <button class="btn btn-secondary btn-sm" id="submit-btn"
+                                    <button class="btn btn-secondary btn-sm" id="search-btn"
                                         type="submit">Search</button>
                                     <button class="btn btn-light btn-sm" id="reset-btn" type="reset">Reset</button>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div class="row hide" id="duration-sort-html">
+                    <div class="col-md-18 col-lg-12 mb-15 d-flex align-items-center">
+                        <div class="input-field">
+                            <select id="duration-sort-selection">
+                                <option value="none" selected>Default (none)</option>
+                                <option value="asc">Ascending</option>
+                                <option value="desc">Descending</option>
+                            </select>
+                            <label><i class="fas fa-sort"></i> Sort by Duration</label>
+                        </div>
+                        <button class="btn btn-secondary" id="apply-btn" type="submit"
+                            style="margin: 15px">Apply</button>
                     </div>
                 </div>
             </div>
@@ -186,7 +200,7 @@
                 <p>For more information, please review the <a href="http://www.google.com/policies/privacy"
                         target="_blank">Google Privacy Policy</a>.</p>
                 <div class="align-middle float-right">
-                    <form action="#" class="needs-validation" novalidate>
+                    <form action="javascript:void(0)" class="needs-validation" novalidate>
                         <div class="form-group">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="invalidCheck" required>
@@ -198,9 +212,8 @@
                                 </div>
                             </div>
                         </div>
-
-                        <button href="#!" type="submit"
-                            class="modal-close btn btn-primary btn-md float-right">Continue</button>
+                        <button type="submit" class="modal-close btn btn-primary btn-md float-right"
+                            id="continue">Continue</button>
                     </form>
                 </div>
             </div>

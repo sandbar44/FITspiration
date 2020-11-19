@@ -7,7 +7,7 @@ Do you spend more time looking for a workout than actually working out? Overwhel
 Find all your fitness inspirations in one spot!
 
 FITspiration provides the latest home workouts across multiple platforms using
-optimized keywords! Apply filters to target your fitness needs: workout type, muscle groups, time limit, and more!
+optimized keywords! Apply filters to target your fitness needs and sort as desired!
 
 https://sandbar44.github.io/FITspiration
 
@@ -20,11 +20,12 @@ https://sandbar44.github.io/FITspiration
 - Modals
 - Font Awesome Icons (https://fontawesome.com)
 
-
 ### Javascript
 - jQuery
 - AJAX
-- MomentJS + MomentJS duration plug-in
+- Fetch
+- MomentJS
+- MomentJS duration plug-in
 - User Agreement Validation
 
 ### Public APIs
@@ -36,7 +37,9 @@ https://sandbar44.github.io/FITspiration
 - Firebase
 
 ## Future Development Features
-- Additional filters: difficulty, time limit
+- 'Next page' capability to load more workouts
+- Additional filters: level of difficulty, filter by duration
 - Save your favorite workouts for next time
 - Add your own custom keywords
 - Include more platforms in search (i.e., Reddit)
+- Increased YouTube API quota

@@ -1,8 +1,9 @@
 // OPEN TO DO
-// [] Refactor code
-// [] Add sort by duration after results retrieved
-// [] Update Readme
 // [] Loading icon
+// [] Replace &amp; to &
+// [] Validation does not work on mobile
+// [] Refactor UI code
+// [] Update Readme
 
 // READY DOCUMENT
 $(document).ready(function () {
@@ -65,16 +66,6 @@ $(document).ready(function () {
             term: 'newest',
             optTerm: 'date'
         }
-        // {
-        //     term: 'duration (asc)',
-        //     sortTerm: 'relevance',
-        //     sortDuration: 'shortest'
-        // },
-        // {
-        //     term: 'duration (desc)',
-        //     sortTerm: 'relevance',
-        //     sortDuration: 'longest'
-        // }
     ];
 
     // Define array for Approved Channels (personally picked by me!) 
@@ -96,14 +87,39 @@ $(document).ready(function () {
         , 'UCFKE7WVJfvaHW5q283SxchA' // Yoga With Adriene 
     ];
 
-    // Define application variables
-    // [] Refactor: Which of these varaibles are truly 'global' vs. 'local'
-    var maxResults = 9; // confirmed global
-    var query = []; // confirmed global
-    var sortQuery = 'relevance'; // confirmed global
-    var approvedIndices = [];
-    var otherIndices = [];
-    var workoutDivIds = [];
+    // Define variables to set up Query
+    var maxResults = 9;
+    var query = [];
+    var sortQuery = 'relevance';
+
+    // Define variables to Display Results
+    var workoutIndices = {
+        'rec': [],
+        'other': []
+    };
+    var workoutDivIds = {
+        'rec': [],
+        'other': []
+    };
+
+    // Define variables to Sort by Duration
+    //// Selected sort order (default, asc, desc)
+    var durationSortSelection = '';
+    //// Duration of each video
+    var videoDurations = {
+        'rec': [{ workoutId: '', seconds: '' }],
+        'other': [{ workoutId: '', seconds: '' }]
+    };
+    //// Array of video durations in seconds, to be sorted
+    var durationOrder = {
+        'rec': [],
+        'other': []
+    };
+    //// Final sorted output of workout ids
+    var orderOfVideos = {
+        'rec': [{ workoutId: '', seconds: '' }],
+        'other': [{ workoutId: '', seconds: '' }]
+    };
 
     // FIREBASE
     // ==================================================
@@ -190,12 +206,11 @@ $(document).ready(function () {
             $(this).attr('data-state', 'inactive')
                 .removeClass('active');
             // Then remove from query array, if it exists
-            var removeTerm = query.findIndex(term => term === searchTerm);
-            if (removeTerm > -1) {
+            var removeTerm = query.indexOf(searchTerm);
+            if (query.indexOf(searchTerm) !== -1) {
                 query.splice(removeTerm, 1)
             };
         };
-        console.log(query);
     };
 
     // Create function to Define Sort query (when user clicks a sort button)
@@ -219,7 +234,6 @@ $(document).ready(function () {
             // Then empty sortQuery variable
             sortQuery = '';
         };
-        console.log(sortQuery);
     };
 
     // Create function to Reset filters
@@ -232,12 +246,60 @@ $(document).ready(function () {
         // Reset queries
         query = [];
         sortQuery = 'relevance';
-        console.log(query);
-        console.log(sortQuery);
     };
 
     // POST-SEARCH FUNCTIONS
     // ==================================================
+
+    // Create function to Prepare duration sorting
+    var sortDuration = function (array, order, key) {
+        array.sort(function (a, b) {
+            var A = a[key], B = b[key];
+            if (order.indexOf(A) > order.indexOf(B)) {
+                return 1;
+            } else {
+                return -1;
+            }
+        });
+        return array;
+    }
+
+    // Create function to Apply Duration Sort when Apply button is clicked
+    var applyDurationSort = function (section) {
+        // Determine which option user selected (default, asc, desc)
+        $('select').formSelect(); // Workaround for Materialize bug: must re-initialize form to fetch current selection
+        durationSortSelection = $('#duration-sort-selection').formSelect('getSelectedValues').toString();
+
+        // Duration Psuedo code
+        // [] Display sort duration buttons
+        // [] Reset duration button to default after searching again 
+        // [X] Create duration order
+        // [X] Execute sort
+
+        // Sort videos
+        if (durationSortSelection === 'asc') {
+            // Sort array of seconds (durationOrder) ascending
+            durationOrder[section].sort(function (a, b) { return a - b });
+            // Order videoDurations array based on order of durationOrder array
+            orderOfVideos[section] = sortDuration(videoDurations[section], durationOrder[section], 'seconds');
+        }
+        else if (durationSortSelection === 'desc') {
+            // Sort array of seconds (durationOrder) descending
+            durationOrder[section].sort(function (a, b) { return b - a });
+            // Order videoDurations array based on order of durationOrder array
+            orderOfVideos[section] = sortDuration(videoDurations[section], durationOrder[section], 'seconds');
+        }
+        else {
+            // Maintain original sort
+            orderOfVideos[section] = videoDurations[section];
+        };
+
+        // Execute function to Sort duration
+        for (i = 0; i < workoutIndices[section].length; i++) {
+            var workoutId = orderOfVideos[section][i].workoutId;
+            $(`[position-id='${i}-${section}'`).prepend($(`#${workoutId}`));
+        };
+    };
 
     // Create function to Display search results when Search button is clicked
     var displayWorkouts = function () {
@@ -246,47 +308,66 @@ $(document).ready(function () {
         $('#workout-header').empty();
         $('#workout-view-rec').empty();
         $('#workout-view').empty();
-        approvedIndices = [];
-        otherIndices = [];
+        $('#duration-sort-html').removeClass('hide');
+        $("#duration-sort-selection").val('none').change();
+        workoutIndices = { 'rec': [], 'other': [] };
+        workoutDivIds = { 'rec': [], 'other': [] };
+        durationOrder = { 'rec': [], 'other': [] };
+        videoDurations = { 'rec': [], 'other': [] };
+        orderOfVideos = { 'rec': [], 'other': [] };
+        durationSortSelection = '';
+        workoutData = [];
+
         // Prepare AJAX call to fetch workouts
         var queryURL = 'https://www.googleapis.com/youtube/v3/search?'
-            + 'key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE'
+            // + 'key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE'
             + '&part=snippet'
             + '&type=video'
             + '&maxResults=50'
             + '&topicId=/m/027x7n'
             + '&order=' + sortQuery
             + '&q=workout,' + query;
-        console.log(queryURL);
         // Create AJAX call for the specific search
         $.ajax({
             url: queryURL,
-            method: 'GET'
+            method: 'GET',
         }).done(function (response) {
-            console.log(response);
+            // console.log(response);
             // If no results, show message
-            if (response.pageInfo.totalResults === 0) {
+            if (response.items.length === 0) {
                 $('#workout-view').html('<div class="col-md-12 col-lg-12 mb-12 text-center">Sorry, no results! Try again.</div>');
             }
             // If results exist, populate search results
             else {
                 // Fetch workout data for all results
-                for (i = 0; i < response.pageInfo.resultsPerPage; i++) {
+                for (i = 0; i < response.items.length; i++) {
                     // Identify workouts from approved channels
-                    var approvedChannel = approvedChannels.findIndex(approve => approve === response.items[i].snippet.channelId)
-                    if (approvedChannel > -1) {
-                        approvedIndices.push(i);
+                    var channelId = response.items[i].snippet.channelId;
+                    var workoutId = response.items[i].id.videoId;
+                    var approvedChannel = approvedChannels.findIndex(approve => approve === channelId)
+                    if (approvedChannel !== -1) {
+                        // If workout is from approved channel, push index and workout id into rec array
+                        // Index will be used to fetch content for workout divs; Id will be used for video API call
+                        workoutIndices.rec.push(i);
+                        workoutDivIds.rec.push(workoutId);
                     }
                     else {
-                        otherIndices.push(i);
-                    };
+                        // If workout is from other channels and less than max # of results, push index and workout id into other array
+                        // (max results set in global variables)
+                        if (workoutIndices.other.length < 9) {
+                            workoutIndices.other.push(i);
+                            workoutDivIds.other.push(workoutId);
+                        }
+                    }
                 };
                 // Create function to Create workout divs
-                var createWorkoutDiv = function (i, section) {
+                //// i = index; div = rec or other div section; position = initial sort order; section = rec or other 
+                var createWorkoutDiv = function (i, div, position, section) {
                     // Fetch video ID
                     var workoutId = response.items[i].id.videoId;
                     // Create workout div container
-                    var workoutDiv = $('<div>').addClass('col-md-6 col-lg-4 mb-5');
+                    var workoutDiv = $('<div>').addClass('col-md-6 col-lg-4 mb-5')
+                        .attr('position-id', `${position}-${section}`);
                     // Create workout div content
                     var itemDiv = $('<div>').attr({
                         'id': workoutId,
@@ -308,30 +389,33 @@ $(document).ready(function () {
                         .text(response.items[i].snippet.title + ' ');
                     workoutLink.append(workoutImg, title);
                     // Fetch and display channel and like stats
-                    var channel = $('<span class="channel">').text('by ' + response.items[i].snippet.channelTitle);
-                    var like = $('<span class="like">').html(
-                        `<i class="like-btn far fa-thumbs-up" workout-id="${workoutId}"></i>
-                        <span id="${workoutId}-likes">0</span>`
-                    );
+                    var channel = $('<span>').addClass('channel')
+                        .text('by ' + response.items[i].snippet.channelTitle);
+                    var like = $('<span>').addClass('like')
+                        .html(`
+                        <button class="like-btn" workout-id="${workoutId}">
+                        <i class="far fa-thumbs-up"></i>
+                        <span id="${workoutId}-likes">0</span>
+                        </button>
+                        `);
                     // Fill workout div content
                     itemDiv.append(workoutLink, channel, like);
                     // Add div content to workout div container
                     workoutDiv.append(itemDiv);
                     // Add workout div to desired section
-                    $(section).append(workoutDiv);
-                    // Add workout ID to array for future usage (video API, video stats) 
-                    workoutDivIds.push(workoutId);
+                    $(div).append(workoutDiv);
                 }
             };
             // Populate search results under Recommended Workouts (approved channels)
-            if (approvedIndices.length > 0) {
-                // Create recommended header                
+            if (workoutIndices.rec.length > 0) {
+                // Create recommended header
                 var workoutHeader = $('<h2>').addClass('page-section-heading text-center text-uppercase text-secondary mb-0')
                     .text('Recommended Workouts');
                 $('#workout-header-rec').html(workoutHeader);
-                // Call function to Create workout divs with relevant Indices and into desired section
-                for (j = 0; j < approvedIndices.length; j++) {
-                    createWorkoutDiv(approvedIndices[j], '#workout-view-rec');
+                // Call function to Create workout divs with relevant Indices and into Rec'd Workouts section
+                for (j = 0; j < workoutIndices.rec.length; j++) {
+                    // Parameters: index, div section, position, section 
+                    createWorkoutDiv(workoutIndices.rec[j], '#workout-view-rec', j, 'rec');
                 };
             };
             // Populate search results under Search Results (other channels, max results set in global variables)
@@ -339,42 +423,60 @@ $(document).ready(function () {
             var workoutHeader = $('<h2>').addClass('page-section-heading text-center text-uppercase text-secondary mb-0')
                 .text('Search Results');
             $('#workout-header').html(workoutHeader);
-            // Call function to Create workout divs with relevant Indices and into desired section
-            for (j = 0; j < maxResults; j++) {
-                createWorkoutDiv(otherIndices[j], '#workout-view');
+            // Call function to Create workout divs with relevant Indices and into Search Results section
+            for (j = 0; j < maxResults && j < workoutIndices.other.length; j++) {
+                // Parameters: index, div section, position, section 
+                createWorkoutDiv(workoutIndices.other[j], '#workout-view', j, 'other');
             };
-            // Prepare AJAX call to fetch video stats
-            var queryURLvideo = 'https://www.googleapis.com/youtube/v3/videos?'
-                + 'key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE'
-                + '&id=' + workoutDivIds
-                + '&part=snippet,contentDetails';
-            console.log(queryURLvideo);
-            // Fetch workout video stats
-            $.ajax({
-                url: queryURLvideo,
-                method: 'GET'
-            }).done(function (response) {
-                console.log(response);
-                // Fetch data for each workout video
-                for (i = 0; i < response.items.length; i++) {
-                    // Fetch video ID
-                    var videoId = response.items[i].id;
-                    // Fetch video duration and convert to user friendly display
-                    var ytDuration = response.items[i].contentDetails.duration;
-                    var duration = moment
-                        .duration(ytDuration)
-                        .format('h:mm:ss')
-                        .padStart(4, '0:0');
-                    // Add duration to each thumbnail
-                    var durationDiv = $('<div>').addClass('ytd-thumbnail-overlay-time-status-renderer');
-                    durationDiv.text(duration);
-                    $(`#${videoId}`).append(durationDiv);
-                };
-            });
+            // Create function to Execute AJAX call to fetch video stats
+            var fetchVideoStats = function (workoutIds, section) {
+                var queryURLvideo = 'https://www.googleapis.com/youtube/v3/videos?'
+                    // + 'key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE'
+                    + '&id=' + workoutIds
+                    + '&part=snippet,contentDetails';
+                // Fetch workout video stats
+                $.ajax({
+                    url: queryURLvideo,
+                    method: 'GET',
+                    success: function (response) {
+                        // console.log(response);
+                        // Fetch data for each workout video
+                        for (i = 0; i < response.items.length; i++) {
+                            // Fetch video ID
+                            var workoutId = response.items[i].id;
+                            // Fetch video duration and convert to user friendly display
+                            var ytDuration = response.items[i].contentDetails.duration;
+                            var duration = moment.duration(ytDuration)
+                                .format('h:mm:ss')
+                                .padStart(4, '0:0');
+                            // Add duration to each thumbnail
+                            var durationDiv = $('<div>').addClass('ytd-thumbnail-overlay-time-status-renderer');
+                            durationDiv.text(duration);
+                            $(`#${workoutId}`).append(durationDiv);
+                            // Convert duration to seconds for duration sorting
+                            var mjSeconds = moment.duration(ytDuration)
+                                .format('ss');
+                            var durationSeconds = parseInt(mjSeconds.replace(/,/g, ''), 10);
+                            // Push each video stat to videoDuration array
+                            videoDurations[section].push({
+                                workoutId: workoutId,
+                                seconds: durationSeconds
+                            });
+                            // Push durations into durationOrder array to be sorted
+                            durationOrder[section].push(durationSeconds);
+                        };
+                    }
+                }).fail(function (response) {
+                    console.log('GET failed for video stats!');
+                    console.log(response);
+                });
+            };
+            // Execute function to Fetch video stats for Rec'd and Other workouts
+            fetchVideoStats(workoutDivIds.rec, 'rec');
+            fetchVideoStats(workoutDivIds.other, 'other');
             // Retrieve Firebase data
             database.ref('/workouts').on('child_added', function (snapshot) {
                 // Get snapshot data
-                console.log(snapshot.val());
                 var workoutId = snapshot.val().workoutId;
                 var likeCount = snapshot.val().likeCount;
                 // Display stats for each workout
@@ -390,15 +492,15 @@ $(document).ready(function () {
                 $('#workout-header-rec').html(workoutHeader);
                 // Prepend WOD html to Recommended results
                 $('#workout-view-rec').prepend($('#wod-item-template').html());
-            }
+            };
         }).fail(function (response) {
+            console.log('GET failed for initial search!');
+            console.log(response);
             // Empty the contents of search results
             $('#workout-header-rec').empty();
             $('#workout-header').empty();
             $('#workout-view').empty();
-            console.log(response);
             $('#workout-view').html('<div class="col-md-12 col-lg-12 mb-12 text-center">Error. Please try again later.</div>');
-            console.log('GET failed!');
         });
     };
 
@@ -422,8 +524,6 @@ $(document).ready(function () {
         var likeCount = $(`#${workoutId}-likes`).text();
         // Increase Like count by 1        
         likeCount++;
-        console.log(workoutId);
-        console.log(likeCount);
         // Update Firebase data
         database.ref('workouts/' + workoutId).update({
             workoutId,
@@ -450,9 +550,12 @@ $(document).ready(function () {
             var validation = Array.prototype.filter.call(forms, function (form) {
                 form.addEventListener('submit', function (event) {
                     if (form.checkValidity() === false) {
-                        event.preventDefault();
-                        event.stopPropagation();
+                        // event.preventDefault();
+                        // event.stopPropagation();
                         $('#user-agreement').modal('open');
+                    }
+                    else {
+                        $('#user-agreement').modal('close');
                     }
                     form.classList.add('was-validated');
                 }, false);
@@ -463,7 +566,6 @@ $(document).ready(function () {
     // Initialize Modals
     $('#user-agreement').modal({
         'dismissible': false,
-        'onCloseStart': validateForm()
     });
     $('#user-agreement').modal('open');
 
@@ -475,7 +577,7 @@ $(document).ready(function () {
     $(document).on('click', '.sort-btn', createSort);
 
     // Set click event listener to Execute search
-    $('#submit-btn').on('click', displayWorkouts);
+    $('#search-btn').on('click', displayWorkouts);
 
     // Set click event listener to Reset filters
     $('#reset-btn').on('click', resetFilters);
@@ -483,8 +585,11 @@ $(document).ready(function () {
     // Set click event listener to Execute 'Like' button
     $(document).on('click', '.like-btn', increaseLikes);
 
-    // Click event listener to Regenerate WOD
+    // Set click event listener to Regenerate WOD
     $('#generate-wod').on('click', generateWod);
+
+    // Execute Validate User Agreement
+    validateForm();
 
     // Calling the renderButtons function to display the intial buttons
     renderButtons('#workout-type-btns', workoutTypes, 'filter-btn');
@@ -496,5 +601,14 @@ $(document).ready(function () {
 
     // Execute Generate WOD function 
     generateWod();
+
+    // Initialize Duration Sort drop down
+    $('select').formSelect();
+
+    // Set click event listener to Retrieve Duration Sort
+    $('#apply-btn').on('click', function () {
+        applyDurationSort('rec');
+        applyDurationSort('other');
+    })
 
 });
