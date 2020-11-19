@@ -7091,7 +7091,8 @@ input[type=range]::-ms-thumb {
 
 .preloader-wrapper.active {
     -webkit-animation: container-rotate 1568ms linear infinite;
-    animation: container-rotate 1568ms linear infinite
+    animation: container-rotate 1568ms linear infinite;
+    background-color: transparent;
 }
 
 @-webkit-keyframes container-rotate {

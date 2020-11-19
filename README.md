@@ -14,7 +14,7 @@ https://sandbar44.github.io/FITspiration
 ## Technologies Used
 
 ### Styling
-- CSS Frameworks: Bootstrap (main), Materialize (modal-footer, card styling)
+- CSS Frameworks: Bootstrap, Materialize CSS
 - Start Bootstrap Theme (https://startbootstrap.com/theme/freelancer)
 - Mobile Responsive
 - Modals

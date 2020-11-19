@@ -109,6 +109,24 @@
                 </div>
             </div>
         </section>
+        <!-- Preloader Section -->
+        <section class="page-section portfolio hide" id="preloader">
+            <div class="container center">
+                <div class="preloader-wrapper big active">
+                    <div class="spinner-layer spinner-blue-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="gap-patch">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
         <!-- Recommended Workouts Section-->
         <section class="page-section portfolio" id="portfolio-rec">
             <div class="container">
@@ -143,8 +161,10 @@
                 <div class="workout-item mx-auto">
                     <span class="channel">by Deniz Gurkaynak</span>
                     <span class="like">
-                        <i class="like-btn far fa-thumbs-up" workout-id="randomWod"></i>
-                        <span id="randomWod-likes">0</span>
+                        <button class="like-btn" workout-id="randomWod">
+                            <i class="far fa-thumbs-up"></i>
+                            <span id="randomWod-likes">0</span>
+                        </button>
                     </span>
                 </div>
             </div>

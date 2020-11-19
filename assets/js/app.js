@@ -1,9 +1,6 @@
-// OPEN TO DO
-// [] Loading icon
+// Remaining TO DO
 // [] Replace &amp; to &
-// [] Validation does not work on mobile
 // [] Refactor UI code
-// [] Update Readme
 
 // READY DOCUMENT
 $(document).ready(function () {
@@ -38,11 +35,11 @@ $(document).ready(function () {
         },
         {
             term: 'upper',
-            optTerm: 'upper+body'
+            optTerm: 'upper+body,arms,shoulders'
         },
         {
             term: 'lower',
-            optTerm: 'lower+body'
+            optTerm: 'lower+body,glutes,legs'
         },
         {
             term: 'full',
@@ -105,6 +102,11 @@ $(document).ready(function () {
     // Define variables to Sort by Duration
     //// Selected sort order (default, asc, desc)
     var durationSortSelection = '';
+    //// Duration of each video, in default sort order
+    var videoDurationsDefault = {
+        'rec': [{ workoutId: '', seconds: '' }],
+        'other': [{ workoutId: '', seconds: '' }]
+    };
     //// Duration of each video
     var videoDurations = {
         'rec': [{ workoutId: '', seconds: '' }],
@@ -270,12 +272,6 @@ $(document).ready(function () {
         $('select').formSelect(); // Workaround for Materialize bug: must re-initialize form to fetch current selection
         durationSortSelection = $('#duration-sort-selection').formSelect('getSelectedValues').toString();
 
-        // Duration Psuedo code
-        // [] Display sort duration buttons
-        // [] Reset duration button to default after searching again 
-        // [X] Create duration order
-        // [X] Execute sort
-
         // Sort videos
         if (durationSortSelection === 'asc') {
             // Sort array of seconds (durationOrder) ascending
@@ -291,7 +287,7 @@ $(document).ready(function () {
         }
         else {
             // Maintain original sort
-            orderOfVideos[section] = videoDurations[section];
+            orderOfVideos[section] = videoDurationsDefault[section];
         };
 
         // Execute function to Sort duration
@@ -303,16 +299,21 @@ $(document).ready(function () {
 
     // Create function to Display search results when Search button is clicked
     var displayWorkouts = function () {
+        // Display loading icon
+        $('#preloader').removeClass('hide');
+
         // Reset search results
         $('#workout-header-rec').empty();
         $('#workout-header').empty();
         $('#workout-view-rec').empty();
         $('#workout-view').empty();
-        $('#duration-sort-html').removeClass('hide');
         $("#duration-sort-selection").val('none').change();
+        $('select').formSelect(); // Workaround for Materialize bug: must re-initialize form to fetch current selection
+
         workoutIndices = { 'rec': [], 'other': [] };
         workoutDivIds = { 'rec': [], 'other': [] };
         durationOrder = { 'rec': [], 'other': [] };
+        videoDurationsDefault = { 'rec': [], 'other': [] };
         videoDurations = { 'rec': [], 'other': [] };
         orderOfVideos = { 'rec': [], 'other': [] };
         durationSortSelection = '';
@@ -320,7 +321,7 @@ $(document).ready(function () {
 
         // Prepare AJAX call to fetch workouts
         var queryURL = 'https://www.googleapis.com/youtube/v3/search?'
-            // + 'key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE'
+            + 'key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE'
             + '&part=snippet'
             + '&type=video'
             + '&maxResults=50'
@@ -333,6 +334,10 @@ $(document).ready(function () {
             method: 'GET',
         }).done(function (response) {
             // console.log(response);
+            // Hide loading icon
+            $('#preloader').addClass('hide');
+            // Display Duration Sort element
+            $('#duration-sort-html').removeClass('hide');
             // If no results, show message
             if (response.items.length === 0) {
                 $('#workout-view').html('<div class="col-md-12 col-lg-12 mb-12 text-center">Sorry, no results! Try again.</div>');
@@ -431,44 +436,49 @@ $(document).ready(function () {
             // Create function to Execute AJAX call to fetch video stats
             var fetchVideoStats = function (workoutIds, section) {
                 var queryURLvideo = 'https://www.googleapis.com/youtube/v3/videos?'
-                    // + 'key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE'
+                    + 'key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE'
                     + '&id=' + workoutIds
                     + '&part=snippet,contentDetails';
                 // Fetch workout video stats
                 $.ajax({
                     url: queryURLvideo,
                     method: 'GET',
-                    success: function (response) {
-                        // console.log(response);
-                        // Fetch data for each workout video
-                        for (i = 0; i < response.items.length; i++) {
-                            // Fetch video ID
-                            var workoutId = response.items[i].id;
-                            // Fetch video duration and convert to user friendly display
-                            var ytDuration = response.items[i].contentDetails.duration;
-                            var duration = moment.duration(ytDuration)
-                                .format('h:mm:ss')
-                                .padStart(4, '0:0');
-                            // Add duration to each thumbnail
-                            var durationDiv = $('<div>').addClass('ytd-thumbnail-overlay-time-status-renderer');
-                            durationDiv.text(duration);
-                            $(`#${workoutId}`).append(durationDiv);
-                            // Convert duration to seconds for duration sorting
-                            var mjSeconds = moment.duration(ytDuration)
-                                .format('ss');
-                            var durationSeconds = parseInt(mjSeconds.replace(/,/g, ''), 10);
-                            // Push each video stat to videoDuration array
-                            videoDurations[section].push({
-                                workoutId: workoutId,
-                                seconds: durationSeconds
-                            });
-                            // Push durations into durationOrder array to be sorted
-                            durationOrder[section].push(durationSeconds);
-                        };
-                    }
+                }).done(function (response) {
+                    // console.log(response);
+                    // Fetch data for each workout video
+                    for (i = 0; i < response.items.length; i++) {
+                        // Fetch video ID
+                        var workoutId = response.items[i].id;
+                        // Fetch video duration and convert to user friendly display
+                        var ytDuration = response.items[i].contentDetails.duration;
+                        var duration = moment.duration(ytDuration)
+                            .format('h:mm:ss')
+                            .padStart(4, '0:0');
+                        // Add duration to each thumbnail
+                        var durationDiv = $('<div>').addClass('ytd-thumbnail-overlay-time-status-renderer');
+                        durationDiv.text(duration);
+                        $(`#${workoutId}`).append(durationDiv);
+                        // Convert duration to seconds for duration sorting
+                        var mjSeconds = moment.duration(ytDuration)
+                            .format('ss');
+                        var durationSeconds = parseInt(mjSeconds.replace(/,/g, ''), 10);
+                        // Push each video stat to videoDuration arrays
+                        videoDurationsDefault[section].push({
+                            workoutId: workoutId,
+                            seconds: durationSeconds
+                        });
+                        videoDurations[section].push({
+                            workoutId: workoutId,
+                            seconds: durationSeconds
+                        });
+                        // Push durations into durationOrder array to be sorted
+                        durationOrder[section].push(durationSeconds);
+                    };
                 }).fail(function (response) {
                     console.log('GET failed for video stats!');
                     console.log(response);
+                    // Hide loading icon
+                    $('#preloader').addClass('hide');
                 });
             };
             // Execute function to Fetch video stats for Rec'd and Other workouts
@@ -496,6 +506,8 @@ $(document).ready(function () {
         }).fail(function (response) {
             console.log('GET failed for initial search!');
             console.log(response);
+            // Hide loading icon
+            $('#preloader').addClass('hide');
             // Empty the contents of search results
             $('#workout-header-rec').empty();
             $('#workout-header').empty();
@@ -588,10 +600,16 @@ $(document).ready(function () {
     // Set click event listener to Regenerate WOD
     $('#generate-wod').on('click', generateWod);
 
+    // Set click event listener to Retrieve Duration Sort
+    $('#apply-btn').on('click', function () {
+        applyDurationSort('rec');
+        applyDurationSort('other');
+    })
+
     // Execute Validate User Agreement
     validateForm();
 
-    // Calling the renderButtons function to display the intial buttons
+    // Execute renderButtons function to display the intial buttons
     renderButtons('#workout-type-btns', workoutTypes, 'filter-btn');
     renderButtons('#muscle-group-btns', muscleGroups, 'filter-btn');
     renderButtons('#sort-by-btns', sortBy, 'sort-btn');
@@ -604,11 +622,5 @@ $(document).ready(function () {
 
     // Initialize Duration Sort drop down
     $('select').formSelect();
-
-    // Set click event listener to Retrieve Duration Sort
-    $('#apply-btn').on('click', function () {
-        applyDurationSort('rec');
-        applyDurationSort('other');
-    })
 
 });
