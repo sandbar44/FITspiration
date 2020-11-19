@@ -243,6 +243,8 @@ $(document).ready(function () {
         // Reset buttons
         $('.filter-btn').attr('data-state', 'inactive')
             .removeClass('active');
+        $('.sort-btn').attr('data-state', 'inactive')
+            .removeClass('active');
         $('.sort-btn[defaultId=0]').attr('data-state', 'active')
             .addClass('active');
         // Reset queries
