@@ -139,6 +139,27 @@ $(document).ready(function () {
     };
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
+    // Firebase Authentication
+    firebase.auth().signInAnonymously()
+        .then(() => {
+            // Signed in..
+        })
+        .catch((error) => {
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            // ...
+        });
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            // User is signed in, see docs for a list of available properties
+            // https://firebase.google.com/docs/reference/js/firebase.User
+            var uid = user.uid;
+            // ...
+        } else {
+            // User is signed out
+            // ...
+        }
+    });
 
     // Define variable to reference firebase database
     var database = firebase.database();
@@ -319,7 +340,6 @@ $(document).ready(function () {
         videoDurations = { 'rec': [], 'other': [] };
         orderOfVideos = { 'rec': [], 'other': [] };
         durationSortSelection = '';
-        workoutData = [];
 
         // Prepare AJAX call to fetch workouts
         var queryURL = 'https://www.googleapis.com/youtube/v3/search?'
