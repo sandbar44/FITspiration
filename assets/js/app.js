@@ -128,7 +128,7 @@ $(document).ready(function () {
 
     // Initialize Firebase configuration
     var firebaseConfig = {
-        apiKey: "AIzaSyCWk94a0_WAd_Cl4W7sveje-QAhV_q2ZVU",
+        apiKey: "",
         authDomain: "fitspiration-a396c.firebaseapp.com",
         databaseURL: "https://fitspiration-a396c.firebaseio.com",
         projectId: "fitspiration-a396c",
@@ -371,7 +371,7 @@ $(document).ready(function () {
 
         // Prepare AJAX call to fetch workouts
         var queryURL = 'https://www.googleapis.com/youtube/v3/search?'
-            + 'key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE'
+            + 'key='
             + '&part=snippet'
             + '&type=video'
             + '&maxResults=50'
@@ -486,7 +486,7 @@ $(document).ready(function () {
             // Create function to Execute AJAX call to fetch video stats
             var fetchVideoStats = function (workoutIds, section) {
                 var queryURLvideo = 'https://www.googleapis.com/youtube/v3/videos?'
-                    + 'key=AIzaSyBd4PGSzxnrnGrSj1R0vz9JNcWsA-KwcFE'
+                    + 'key='
                     + '&id=' + workoutIds
                     + '&part=snippet,contentDetails';
                 // Fetch workout video stats
